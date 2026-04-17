@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diffie-Hellman Key Exchange</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+        input, button {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Diffie-Hellman Key Exchange</h2>
+
+<label>Enter modulo (p):</label>
+<input type="number" id="p"><br>
+
+<label>Enter primitive root (g):</label>
+<input type="number" id="g"><br>
+
+<label>Enter 1st secret number (a):</label>
+<input type="number" id="a"><br>
+
+<label>Enter 2nd secret number (b):</label>
+<input type="number" id="b"><br>
+
+<button onclick="calculate()">Compute</button>
+
+<h3>Result:</h3>
+<p id="result"></p>
+
+<script>
+// Modular exponentiation (fast power)
+function modExp(base, exp, mod) {
+    let result = 1;
+    base = base % mod;
+
+    while (exp > 0) {
+        if (exp % 2 === 1) {
+            result = (result * base) % mod;
+        }
+        exp = Math.floor(exp / 2);
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+function calculate() {
+    let p = parseInt(document.getElementById("p").value);
+    let g = parseInt(document.getElementById("g").value);
+    let a = parseInt(document.getElementById("a").value);
+    let b = parseInt(document.getElementById("b").value);
+
+    // Public keys
+    let A = modExp(g, a, p);
+    let B = modExp(g, b, p);
+
+    // Shared secrets
+    let S_A = modExp(B, a, p);
+    let S_B = modExp(A, b, p);
+
+    let output = `
+        Public Key of 1st Person (A): ${A} <br>
+        Public Key of 2nd Person (B): ${B} <br><br>
+        Secret computed by 1st Person: ${S_A} <br>
+        Secret computed by 2nd Person: ${S_B} <br><br>
+    `;
+
+    if (S_A === S_B) {
+        output += `<b>They can communicate securely!</b><br>
+                   Shared Secret = ${S_A}`;
+    } else {
+        output += `<b>Key exchange failed!</b>`;
+    }
+
+    document.getElementById("result").innerHTML = output;
+}
+</script>
+
+</body>
+</html>
